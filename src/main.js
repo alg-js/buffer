@@ -1,75 +1,46 @@
-/* @ts-self-types="./types.d.ts" */
+/* @ts-self-types="./main.d.ts" */
 
-/**
- * Creates a queue with the given capacity and values
- *
- * @template T
- * @param {number} capacity
- * @param {Iterable<T> | null} initial
- * @returns {CircularQueue<T>}
- */
-export function circularQueue(capacity, initial = null) {
-    return new CircularQueue(capacity, initial)
-}
-
-
-/**
- * A circular queue/buffer.
- *
- * Does not hold references to objects once they are removed from the queue.
- *
- * @template T
- */
-export class CircularQueue {
-    /** @type {?T[]} */
+export class Buffer {
     #buffer;
-    /** @type {number} */
     #capacity;
-    /** @type {number} */
     #front;
-    /** @type {number} */
     #back;
-    /** @type {number} */
     #size;
 
-    /**
-     * Creates a queue with the given capacity and values
-     *
-     * @param {number} capacity
-     * @param {Iterable<T> | null} initial
-     */
-    constructor(capacity, initial = null) {
+    constructor(capacity) {
         this.#capacity = capacity;
         this.#buffer = Array(capacity).fill(null);
         this.#front = 0;
         this.#back = 0;
         this.#size = 0;
-        if (initial !== null) {
-            this.pushAll(initial)
-        }
     }
 
-    /**
-     * Returns the size of the queue
-     * @returns {number}
-     */
-    size() {
+    static from(capacity, initial) {
+        const buffer = new Buffer(capacity);
+        buffer.pushAll(initial);
+        return buffer;
+    }
+
+    get length() {
         return this.#size;
     }
 
-    /**
-     * Returns the capacity of the queue
-     * @returns {number}
-     */
-    capacity() {
+    get capacity() {
         return this.#capacity;
     }
 
-    /**
-     * Adds an item to the queue
-     * @param {T} item
-     * @throws {Error} if the queue is full
-     */
+    at(index) {
+        if (index < -this.length || index >= this.length) {
+            return undefined;
+        } else if (index < 0) {
+            index = mod(this.#back + index, this.capacity);
+            return this.#buffer[index];
+        } else {
+            index = mod(this.#front + index, this.capacity);
+            return this.#buffer[index];
+        }
+    }
+
     push(item) {
         if (this.#size === this.#capacity) {
             throw new Error("called `.push` on full queue");
@@ -80,22 +51,36 @@ export class CircularQueue {
         }
     }
 
-    /**
-     * Puts all items in the queue in order
-     * @param {Iterable<T>} items
-     * @throws {Error} if the queue does not have capacity
-     */
+    pushBack(item) {
+        this.push(item);
+    }
+
+    pushFront(item) {
+        if (this.#size === this.#capacity) {
+            throw new Error("called `.pushFront` on full queue");
+        } else {
+            this.#front = mod(this.#front - 1, this.#capacity);
+            this.#buffer[this.#front] = item;
+            this.#size += 1;
+        }
+    }
+
     pushAll(items) {
         for (const item of items) {
             this.push(item);
         }
     }
 
-    /**
-     * Returns the item at the front of the queue
-     * @returns {T} item
-     * @throws {Error} if the queue is empty
-     */
+    pushAllBack(items) {
+        this.pushAll(items);
+    }
+
+    pushAllFront(items) {
+        for (const item of items) {
+            this.pushFront(item);
+        }
+    }
+
     peek() {
         if (this.#size === 0) {
             throw new Error("called `.peek` on empty queue");
@@ -104,11 +89,51 @@ export class CircularQueue {
         }
     }
 
-    /**
-     * Returns and removes the item at the front of the queue
-     * @returns {T} item
-     * @throws {Error} is the queue is empty
-     */
+    peekK(k) {
+        if (this.#size < k) {
+            throw new Error(
+                "called `.peekK` on buffer with fewer than k items",
+            );
+        } else {
+            const result = [];
+            for (let i = 0; i < k; i++) {
+                result.push(this.at(i));
+            }
+            return result;
+        }
+    }
+
+    peekFront() {
+        return this.peek();
+    }
+
+    peekFrontK(k) {
+        return this.peekK(k);
+    }
+
+    peekBack() {
+        if (this.#size === 0) {
+            throw new Error("called `.peekBack` on empty queue");
+        } else {
+            const back = mod(this.#back - 1, this.#capacity);
+            return this.#buffer[back];
+        }
+    }
+
+    peekBackK(k) {
+        if (this.#size < k) {
+            throw new Error(
+                "called `.peekK` on buffer with fewer than k items",
+            );
+        } else {
+            const result = [];
+            for (let i = 0; i < k; i++) {
+                result.push(this.at(-i - 1));
+            }
+            return result;
+        }
+    }
+
     pop() {
         if (this.#size === 0) {
             throw new Error("called `.pop` on empty queue");
@@ -121,11 +146,62 @@ export class CircularQueue {
         }
     }
 
-    /**
-     * Iterator for the queue. Behaviour is not defined if the queue is
-     * modified while iterating.
-     * @returns {Generator<T, void, void>}
-     */
+    popK(k) {
+        if (this.#size < k) {
+            throw new Error("called `.popK` on buffer with fewer than k items");
+        } else {
+            const result = [];
+            for (let i = 0; i < k; i++) {
+                result.push(this.pop());
+            }
+            return result;
+        }
+    }
+
+    popFront() {
+        return this.pop();
+    }
+
+    popFrontK(k) {
+        return this.popK(k);
+    }
+
+    popBack() {
+        if (this.#size === 0) {
+            throw new Error("called `.popBack` on empty queue");
+        } else {
+            this.#back = mod(this.#back - 1, this.#capacity);
+            const value = this.#buffer[this.#back];
+            this.#buffer[this.#back] = null;
+            this.#size -= 1;
+            return value;
+        }
+    }
+
+    popBackK(k) {
+        if (this.#size < k) {
+            throw new Error(
+                "called `.popBackK` on buffer with fewer than k items",
+            );
+        } else {
+            const result = [];
+            for (let i = 0; i < k; i++) {
+                result.push(this.popBack());
+            }
+            return result;
+        }
+    }
+
+    * values({reversed = false} = {}) {
+        if (reversed) {
+            for (let i = 0; i < this.length; i++) {
+                yield this.at(-i - 1);
+            }
+        } else {
+            yield* this[Symbol.iterator]();
+        }
+    }
+
     * [Symbol.iterator]() {
         if (this.#size !== 0) {
             yield this.#buffer[this.#front];
@@ -138,4 +214,9 @@ export class CircularQueue {
             }
         }
     }
+}
+
+
+function mod(a, b) {
+    return ((a % b) + b) % b;
 }
