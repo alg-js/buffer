@@ -1,9 +1,9 @@
 # @alg/buffer
 
 [![JSR](https://jsr.io/badges/@alg/buffer)](https://jsr.io/@alg/buffer)
-[![License](https://img.shields.io/badge/MIT-green?label=license)](https://github.com/alg-js/buffer/blob/main/LICENSE)
+[![License](https://img.shields.io/badge/Apache--2.0-green?label=license)](https://github.com/alg-js/buffer/blob/main/LICENSE)
 
-A circular buffer.
+A circular queue/buffer.
 
 See [@alg/deque](https://jsr.io/@alg/deque) for a generic double ended queue.
 
