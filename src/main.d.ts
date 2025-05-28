@@ -29,18 +29,21 @@ export class Buffer<T> {
 
   /**
    * Creates a buffer with the given capacity
-   * @param {number} capacity
+   *
+   * @param {Object} options
+   * @param {number} options.capacity
    */
-  constructor(capacity: number);
+  constructor(options: {capacity: number});
 
   /**
    * Creates a buffer with the given capacity, populated with the given items.
    *
-   * @param {number} capacity
    * @param {Iterable<T>} initial
+   * @param {Object} options
+   * @param {number} options.capacity
    * @returns {Buffer<T>}
    */
-  static from<T>(capacity: number, initial: Iterable<T>): Buffer<T>;
+  static from<T>(initial: Iterable<T>, options: {capacity: number}): Buffer<T>;
 
   /**
    * Returns the item at the given index.

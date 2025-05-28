@@ -22,7 +22,7 @@ export class Buffer {
     #back;
     #size;
 
-    constructor(capacity) {
+    constructor({capacity}) {
         this.#capacity = capacity;
         this.#buffer = Array(capacity).fill(null);
         this.#front = 0;
@@ -30,8 +30,8 @@ export class Buffer {
         this.#size = 0;
     }
 
-    static from(capacity, initial) {
-        const buffer = new Buffer(capacity);
+    static from(initial, options) {
+        const buffer = new Buffer(options);
         buffer.pushAll(initial);
         return buffer;
     }

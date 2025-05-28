@@ -18,7 +18,7 @@ deno add jsr:@alg/buffer
 ```javascript
 import {Buffer} from "@alg/buffer";
 
-const buff = Buffer.from(16, ["A", "B"]);
+const buff = Buffer.from(["A", "B"], {capacity: 16});
 
 buff.push("C");
 buff.pushAll(["X", "Y", "Z"]);
@@ -39,7 +39,7 @@ methods.
 ```javascript
 import {Buffer} from "@alg/buffer";
 
-const buff = new Buffer(16);
+const buff = new Buffer({capacity: 16});
 
 buff.pushBack("A");
 buff.pushAllBack(["B", "C"]);
