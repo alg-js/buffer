@@ -15,6 +15,7 @@
 
 import {assertEquals, assertThrows} from "jsr:@std/assert@1";
 import {Buffer} from "../src/main.js";
+import fc from "npm:fast-check";
 import {range} from "jsr:@alg/range";
 import {alph, assertIterEquals} from "./utils.js";
 
@@ -243,7 +244,10 @@ Deno.test({
 
 Deno.test({
     name: "Buffers can be iterated",
-    fn: () => assertIterEquals(Buffer.from(alph(3), {capacity: 5}), ["a", "b", "c"]),
+    fn: () => assertIterEquals(
+        Buffer.from(alph(3), {capacity: 5}),
+        ["a", "b", "c"],
+    ),
 });
 
 Deno.test({
@@ -265,5 +269,23 @@ Deno.test({
         }
         assertEquals([...large.values()], arr);
         assertEquals([...large.values({reversed: true})], arr.toReversed());
-    }
+    },
+});
+
+Deno.test({
+    name: "Buffers can be stringed",
+    fn: () => fc.assert(fc.property(
+        fc.array(fc.integer(), {maxLength: 128}),
+        (data) => {
+            const buff1 = new Buffer({capacity: data.length + 1});
+            data.forEach((e) => buff1.push(e));
+            assertEquals(buff1.toString(), `[${data.toString()}]`);
+
+            const buff2 = new Buffer({capacity: data.length});
+            data.slice(0, data.length / 2).forEach((e) => buff2.push(e));
+            data.slice(0, data.length / 2).forEach(() => buff2.pop());
+            data.forEach((e) => buff2.push(e));
+            assertEquals(buff2.toString(), `[${data.toString()}]`);
+        },
+    )),
 });

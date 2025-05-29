@@ -217,6 +217,10 @@ export class Buffer {
         }
     }
 
+    toString() {
+        return `[${this[Symbol.toStringTag]}]`;
+    }
+
     * [Symbol.iterator]() {
         if (this.#size !== 0) {
             yield this.#buffer[this.#front];
@@ -227,6 +231,21 @@ export class Buffer {
             ) {
                 yield this.#buffer[i];
             }
+        }
+    }
+
+    get [Symbol.toStringTag]() {
+        if (this.length === 0) {
+            return "";
+        } else if (this.#front < this.#back) {
+            return this.#buffer
+                .slice(this.#front, this.#back)
+                .toString();
+        } else {
+            return this.#buffer
+                .slice(this.#front)
+                .concat(this.#buffer.slice(0, this.#back))
+                .toString();
         }
     }
 }
