@@ -1,7 +1,7 @@
 # @alg/buffer
 
 [![JSR](https://jsr.io/badges/@alg/buffer)](https://jsr.io/@alg/buffer)
-[![License](https://img.shields.io/badge/Apache--2.0-green?label=license)](https://github.com/alg-js/buffer/blob/main/LICENSE)
+[![License](https://img.shields.io/badge/Apache--2.0-green?label=license)](https://codeberg.org/algjs/buffer/src/branch/main/LICENSE)
 
 A circular queue/buffer.
 
@@ -12,6 +12,27 @@ See [@alg/deque](https://jsr.io/@alg/deque) for a generic double ended queue.
 ```
 deno add jsr:@alg/buffer
 ```
+
+<details>
+<summary>Other Install Options</summary>
+
+```bash
+npx jsr add @alg/buffer
+```
+```bash
+bunx jsr add @alg/buffer
+```
+```bash
+pnpm i jsr:@alg/buffer
+```
+```bash
+yarn add jsr:@alg/buffer
+```
+```bash
+vlt install jsr:@alg/buffer
+```
+
+</details>
 
 ## Example
 
